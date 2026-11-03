@@ -1,0 +1,40 @@
+# ---- 抓包与中间产物（体积大，不入库）----
+*.csv
+*.sal
+*.sr
+_conv*/
+_diag/
+_t16/
+_probe/
+*.npz
+*.bin
+!samples/*.bin
+
+# ---- 输出目录 ----
+pages*/
+pages_*/
+全部页面*/
+输出*/
+
+# ---- 临时调试图 ----
+_*.png
+!samples/_*.png
+
+# ---- Python ----
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# ---- 编辑器 / 系统 ----
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
+
+# ---- 临时调试脚本 ----
+_*.py
+
+# 抓到的真实设备截图不入库
+shot*.png
+demo_auto_result.png

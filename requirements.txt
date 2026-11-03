@@ -1,0 +1,9 @@
+# 核心依赖（解码必需）
+numpy>=1.21
+pillow>=9.0
+
+# fast_decode.py 的快速读表路径（不装也能跑，会退回内置分块解析，慢 3~5 倍）
+pandas>=1.3
+
+# 可选：Saleae Logic 2 自动化抓包（page_watcher.py / saleae_pages.py）
+# logic2-automation>=1.0.11
