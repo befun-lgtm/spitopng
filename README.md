@@ -237,12 +237,21 @@ python fast_decode.py digital.csv --out-dir pages
 | 参数 | 默认 | 说明 |
 |---|---|---|
 | `--out-dir` | `pages_fast` | 输出目录 |
+| `--channels SCL CS DC SDA` | `0 1 2 3` | CSV 里的数据列序号（= Logic 上的 Channel N）。**接线换了顺序就改这里**；5 列的 sigrok 导出常见是 `0 2 3 1` |
+| `--width/--height` | `160/128` | 面板分辨率 |
+| `--offset-x/--offset-y` | `1/2` | GRAM 偏移。默认值是那台遥控器实测的，**换一块屏一般要改成 `0 0`** |
+| `--madctl` | `none` | `none` 不做几何变换；`auto` 用抓到的 `0x36` 推 MV/MX/MY |
+| `--byte-order` | `big` | RGB565 高低字节顺序，反了会出现噪点/偏色 |
+| `--color-order` | `rgb` | `auto` 按 MADCTL bit3 判 RGB/BGR |
 | `--stats-only` | – | 只打印统计（看通道接没接对），不出图 |
 | `--stride` | `20` | 每多少帧合成一张快照（越小越细、越慢） |
 | `--plateau` | `0.10` | 相邻快照差异 < 该百分比 → 视为画面没动 |
 | `--min-run` | `8` | 平台至少连续几张才算「画完」 |
 | `--dedup` | `0.6` | 两个界面差异 < 该百分比 → 视为同一页 |
 | `--rising` / `--falling` | 自动 | 强制采样沿，一般不用给 |
+
+> 默认值是按「160×128 + 偏移 (1,2)」调好的，换设备也能用，但要改 `--offset-x/--offset-y`。
+> 不确定就先用 `st7735_decode.py --auto` 把参数都探一遍，再拿同样参数喂给 `fast_decode.py`。
 
 它做的事和慢速路径完全一样，只是把两个浪费掉的步骤砍了：
 
@@ -444,6 +453,21 @@ RGB565 大端/小端、CS 拆分 1/2/3/5 段、VCD 输入、列顺序打乱+改�
 
 ```bash
 python selftest.py
+```
+
+### `fast_decode.py` 的端到端自测
+
+它和主解码器走的是两条不同的字节流实现，所以单独立了一个用例：
+
+```bash
+python make_test_csv.py demo --spi-hz 6e6 --split 3
+python fast_decode.py demo/capture.csv --channels 0 2 3 1 \
+       --offset-x 0 --offset-y 0 --color-order auto --out-dir demo/out
+# 和 demo/expected.png 比对：0 / 20480 像素不一致
+
+python fast_decode.py demo/capture.csv --channels 0 2 3 1 \
+       --offset-x 0 --offset-y 0 --color-order auto --stats-only
+# 应看到：命令 0x11 / 0x3A / 0x36 / 0x21 / 0x13 / 0x29 / 0x2A / 0x2B / 0x2C
 ```
 
 ```
